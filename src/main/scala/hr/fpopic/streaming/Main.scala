@@ -43,7 +43,7 @@ object MySparkStreamConsumer {
 
     val stream = KafkaUtils
       .createDirectStream[Object, Object, KafkaAvroDecoder, KafkaAvroDecoder](ssc, params, topics)
-      .map { case (key, value) => MyEvent.format.from(value.asInstanceOf[GenericRecord]) }
+      .map { case (_, value) => MyEvent.format.from(value.asInstanceOf[GenericRecord]) }
 
     stream.foreachRDD {
       _.foreach { myEvent =>
