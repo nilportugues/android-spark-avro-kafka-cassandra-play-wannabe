@@ -4,7 +4,7 @@ import com.sksamuel.avro4s.{AvroSchema, RecordFormat}
 import org.apache.avro.Schema
 import org.apache.avro.generic.GenericRecord
 
-case class MyEvent2(item1: Int, item2: Int, a: Int, b: Int, c: Int, d: Int) extends KafkaEvent
+case class MyEvent2(item1: Int, item2: Int, a: Int, b: Int, c: Int, d: Int)
 
 object MyEvent2 {
   val topic: String = "MyEvent2Topic"

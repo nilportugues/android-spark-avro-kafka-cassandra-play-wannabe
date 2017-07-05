@@ -32,6 +32,7 @@ object MySparkStreamConsumer {
 
     myEvent1Stream.foreachRDD { rdd =>
       rdd.foreachPartition { partition =>
+        // do some cassandra work
         partition.foreach { case (_, event) =>
           processMyEvent1(event)
         }
@@ -40,15 +41,14 @@ object MySparkStreamConsumer {
 
     myEvent2Stream.foreachRDD { rdd =>
       rdd.foreachPartition { partition =>
+        // do some cassandra work
         partition.foreach { case (_, event) =>
           processMyEvent2(event)
         }
       }
     }
 
-    sys.ShutdownHookThread {
-      ssc.stop(stopSparkContext = true, stopGracefully = true)
-    }
+    sys.ShutdownHookThread {ssc.stop(stopSparkContext = true, stopGracefully = true)}
 
     ssc.start()
     ssc.awaitTermination()

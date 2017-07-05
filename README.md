@@ -14,3 +14,6 @@ Schema-Registry:
 /usr/bin/schema-registry-start /etc/schema-registry/schema-registry.properties
 ```
 
+Goal:
+
+Android event => REST => Kafka AWS => SparkStreaming => Cassandra
