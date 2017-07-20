@@ -1,0 +1,10 @@
+@(events: Seq[models.MyEvent])
+
+@main("Events") {
+
+        <ul>
+        @for(event <- events) {
+            <li>@event.toString</li>
+        }
+        </ul>
+}
