@@ -1,5 +1,8 @@
 package hr.fpopic.streaming
 
+import com.datastax.spark.connector.streaming._
+import hr.fpopic.conf.StreamingConfiguration
+import hr.fpopic.model.MyEvent1
 import io.confluent.kafka.serializers.KafkaAvroDecoder
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.kafka.KafkaUtils
@@ -7,12 +10,9 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 object MySparkStreamConsumer {
 
-  def processMyEvent1(event: MyEvent1): Unit = {
+  def processMyEvent1(event: MyEvent1): MyEvent1 = {
     println(s"Consuming: $event")
-  }
-
-  def processMyEvent2(event: MyEvent2): Unit = {
-    println(s"Consuming: $event")
+    event
   }
 
   def main(args: Array[String]): Unit = {
@@ -22,31 +22,11 @@ object MySparkStreamConsumer {
 
     val params = StreamingConfiguration.consumerParams
 
-    val myEvent1Stream = KafkaUtils
+    KafkaUtils
       .createDirectStream[Object, Object, KafkaAvroDecoder, KafkaAvroDecoder](ssc, params, Set(MyEvent1.topic))
-      .mapValues(MyEvent1.fromObject)
-
-    val myEvent2Stream = KafkaUtils
-      .createDirectStream[Object, Object, KafkaAvroDecoder, KafkaAvroDecoder](ssc, params, Set(MyEvent2.topic))
-      .mapValues(MyEvent2.fromObject)
-
-    myEvent1Stream.foreachRDD { rdd =>
-      rdd.foreachPartition { partition =>
-        // do some cassandra work
-        partition.foreach { case (_, event) =>
-          processMyEvent1(event)
-        }
-      }
-    }
-
-    myEvent2Stream.foreachRDD { rdd =>
-      rdd.foreachPartition { partition =>
-        // do some cassandra work
-        partition.foreach { case (_, event) =>
-          processMyEvent2(event)
-        }
-      }
-    }
+      .map { case (_, v) => MyEvent1.fromObject(v) }
+      .transform {_.map(processMyEvent1)}
+      .saveToCassandra(keyspaceName = "events", tableName = "myevent1")
 
     sys.ShutdownHookThread {ssc.stop(stopSparkContext = true, stopGracefully = true)}
 

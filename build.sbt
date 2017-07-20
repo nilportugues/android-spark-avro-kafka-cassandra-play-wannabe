@@ -1,7 +1,7 @@
 lazy val root = (project in file(".")).settings(
-  name := "SparkKafkaCassandra",
+  name := "KotlinSparkKafkaCassandraPlay",
   version := "1.0",
-  scalaVersion := "2.11.8",
+  scalaVersion := "2.11.8", // %% apend .scalaVersion
   startYear := Some(2017),
   mainClass in Compile := Some("hr.fpopic.streaming.Main"),
   assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
@@ -9,28 +9,31 @@ lazy val root = (project in file(".")).settings(
   test in assembly := {} // remove if you want to start tests
 )
 
+val sparkVersion = "2.1.1"
+
 lazy val unprovidedDependencies = Seq(
   "org.scalactic" %% "scalactic" % "3.0.1",
-  "org.scalatest" %% "scalatest" % "3.0.1" % "test"
+  "org.scalatest" %% "scalatest" % "3.0.1" % "test",
+
+  "org.apache.spark" %% "spark-streaming-kafka-0-8" % sparkVersion,
+  "org.apache.avro" % "avro" % "1.8.2",
+  "io.confluent" % "kafka-avro-serializer" % "3.2.2",
+  "com.sksamuel.avro4s" %% "avro4s-core" % "1.7.0",
+
+  "com.datastax.spark" %% "spark-cassandra-connector" % "2.0.0",
+  "org.elasticsearch" %% "elasticsearch-spark-20" % "5.4.3"
 )
 
 libraryDependencies ++= unprovidedDependencies
 
-val sparkVersion = "2.1.1"
 
 lazy val providedDependencies = Seq(
   "org.apache.spark" %% "spark-core" % sparkVersion,
   "org.apache.spark" %% "spark-sql" % sparkVersion,
-  "org.apache.spark" %% "spark-streaming" % sparkVersion,
-  "org.apache.spark" %% "spark-streaming-kafka-0-8" % sparkVersion,
-
-  "org.apache.avro" % "avro" % "1.8.2",
-  //"com.twitter" %% "bijection-avro" % "0.9.5",
-  "com.sksamuel.avro4s" %% "avro4s-core" % "1.7.0",
-  "io.confluent" % "kafka-avro-serializer" % "3.2.2"
+  "org.apache.spark" %% "spark-streaming" % sparkVersion
 )
 
-libraryDependencies ++= providedDependencies //.map(_ % "provided")
+libraryDependencies ++= providedDependencies//.map(_ % "provided")
 
 assemblyMergeStrategy in assembly := {
   case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
